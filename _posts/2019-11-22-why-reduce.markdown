@@ -3,10 +3,9 @@ layout: post
 title:  "Why Reduce?"
 date:   2019-11-22 11:59:28 -0500
 categories: swift
+tags: swift programming
 ---
-Why Reduce?
-===========
-*An Example of Using `reduce` in Swift*
+*This post solves a real-life problem in two ways: using a for...in loop, and using `reduce`.*
 
 An alternative to iterating through a collection with a for...in loop is to use a higher-order function. Three common ones are `map`, `filter`, and `reduce`. These all take a function as a parameter, which is a characteristic of a higher-order function.
 
