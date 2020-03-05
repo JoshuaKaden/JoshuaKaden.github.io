@@ -52,14 +52,65 @@ config.expectSuccess = true
 val client = HttpClient(config: config)
 {% endhighlight %}
 
-...which is just fine, obviously, but that first one feels so much cleaner. Or, at least, it feels new, which is kind of exciting.
+...which is just fine, obviously, but that first one feels so much cleaner. And, not having to initialize `config` feels like a win.
 
-My next thought was: Can I do this in Swift?
+My next thought was: Can we do this in Swift?
 
-Yes, I Can Do This In Swift
----------------------------
+Yes, We Can Do Something Like This In Swift
+-------------------------------------------
 
-Here is what I came up with in Swift, to mimic this behavior.
+So, how do we mimic this behavior in Swift?
+
+First, let's create the `config` construct:
+
+{% highlight swift %}
+struct HttpClientConfig {
+    var expectSuccess: Bool = true
+}
+{% endhighlight %}
+
+Nothing fancy here: Just a struct with a single property. Note that the property is mutable: This is required, since we're planning on allowing changes to this property after instantiation.
+
+Next, we need an object to configure:
+
+{% highlight swift %}
+final class HttpClient {
+    let config: HttpClientConfig
+}
+{% endhighlight %}
+
+Again, not much going here. This is a class with a single property to hold an instance of `config`.
+
+All that's left is to create the initializer:
+
+{% highlight swift %}
+init(_ configurationClosure: (inout HttpClientConfig) -> Void) {
+    var config = HttpClientConfig()
+    configurationClosure(&config)
+    self.config = config
+}
+{% endhighlight %}
+
+Let's go through this, line by line. Unfortunately, the first line is most complicated, but the others are much simpler, so don't get discouraged!
+
+1. {% highlight swift %}init(_ configurationClosure: (inout HttpClientConfig) -> Void){% endhighlight %}  
+    This is the method signature for the initializer. It accepts a single parameter.
+      - The `_` as the parameter name indicates that it can be called without a parameter name, like `init(value)`.
+      - `configurationClosure` is the parameter name that can be used inside the method.
+      - The parameter data type is a closure. The closure accepts a single parameter, of the type `HttpClientConfig`.
+      - Note that the closure's parameter is marked as `inout`. This means that changes to it within the closure will be passed back out to the method. Which is key! We definitely want the person who initializes `HttpClient` to be able to modify `config`.
+
+
+2. {% highlight swift %}var config = HttpClientConfig(){% endhighlight %}  
+    Here is where we instantiate `config`. Note that we use `var` here, since we want to allow changes.
+
+3. {% highlight swift %}configurationClosure(&config){% endhighlight %}  
+    This line calls the closure that was passed in to the initializer. Note that we pass the newly instantiated `config` into the closure. Here is where the code that the person who instantiated `HttpClient` will run: Or, in other words, here is where any tweaks to `config` are applied.
+
+4. {% highlight swift %}self.config = config{% endhighlight %}  
+    Finally, we stash `config` into our private property, for future reference.
+    
+Here is the complete solution:
 
 {% highlight swift %}
 struct HttpClientConfig {
@@ -69,13 +120,9 @@ struct HttpClientConfig {
 final class HttpClient {
     let config: HttpClientConfig
 
-    convenience init(_ configurationClosure: (inout HttpClientConfig) -> Void) {
+    init(_ configurationClosure: (inout HttpClientConfig) -> Void) {
         var config = HttpClientConfig()
         configurationClosure(&config)
-        self.init(config: config)
-    }
-
-    init(config: HttpClientConfig) {
         self.config = config
     }
 }
@@ -84,7 +131,7 @@ let client = HttpClient {
     config in
     config.expectSuccess = false
 }
-print(client.config.expectSuccess) // returns `false`
+print(client.config.expectSuccess)
 {% endhighlight %}
 
 Conclusion
