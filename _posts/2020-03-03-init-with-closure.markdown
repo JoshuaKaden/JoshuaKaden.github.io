@@ -105,7 +105,7 @@ Let's go through this, line by line. Unfortunately, the first line is the most c
     Here is where we instantiate `config`. Note that we use `var` here, since we want to allow changes.  
 
 3. `configurationClosure(&config)`  
-    This line calls the closure that was passed in to the initializer. Note that we pass the newly instantiated `config` into the closure. Here is where the code that the person who instantiated `HttpClient` will run: Or, in other words, here is where any tweaks to `config` are applied.  
+    This line calls the closure that was passed in to the initializer. Note that we pass the newly instantiated `config` into the closure, and that we pass it with the special `&` prefix. This is required for [in-out parameters][inout]. Here is where the code that the person who instantiated `HttpClient` will run: Or, in other words, here is where any tweaks to `config` are applied.  
 
 4. `self.config = config`  
     Finally, we stash `config` into our private property, for future reference.  
@@ -165,3 +165,4 @@ I think this could be a useful solution to a complicated initializer. Assuming w
 
 [kmp]: https://kotlinlang.org/docs/reference/multiplatform.html
 [ktor]: https://ktor.io/
+[inout]: https://docs.swift.org/swift-book/LanguageGuide/Functions.html#ID173
