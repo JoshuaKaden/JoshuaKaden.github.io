@@ -93,7 +93,7 @@ init(_ configurationClosure: (inout HttpClientConfig) -> Void) {
 
 Let's go through this, line by line. Unfortunately, the first line is most complicated, but the others are much simpler, so don't get discouraged!
 
-1. {% highlight swift %}init(_ configurationClosure: (inout HttpClientConfig) -> Void){% endhighlight %}  
+1. `init(_ configurationClosure: (inout HttpClientConfig) -> Void)`  
     This is the method signature for the initializer. It accepts a single parameter.
       - The `_` as the parameter name indicates that it can be called without a parameter name, like `init(value)`.
       - `configurationClosure` is the parameter name that can be used inside the method.
@@ -101,15 +101,15 @@ Let's go through this, line by line. Unfortunately, the first line is most compl
       - Note that the closure's parameter is marked as `inout`. This means that changes to it within the closure will be passed back out to the method. Which is key! We definitely want the person who initializes `HttpClient` to be able to modify `config`.
 
 
-2. {% highlight swift %}var config = HttpClientConfig(){% endhighlight %}  
+2. `var config = HttpClientConfig()`  
     Here is where we instantiate `config`. Note that we use `var` here, since we want to allow changes.
 
-3. {% highlight swift %}configurationClosure(&config){% endhighlight %}  
+3. `configurationClosure(&config)`  
     This line calls the closure that was passed in to the initializer. Note that we pass the newly instantiated `config` into the closure. Here is where the code that the person who instantiated `HttpClient` will run: Or, in other words, here is where any tweaks to `config` are applied.
 
-4. {% highlight swift %}self.config = config{% endhighlight %}  
+4. `self.config = config`  
     Finally, we stash `config` into our private property, for future reference.
-    
+
 Here is the complete solution:
 
 {% highlight swift %}
