@@ -79,7 +79,7 @@ final class HttpClient {
 }
 {% endhighlight %}
 
-Again, not much going here. This is a class with a single property to hold an instance of `config`.
+Again, not much going on here. This is a class with a single property to hold an instance of `config`.
 
 All that's left is to create the initializer:
 
@@ -91,24 +91,49 @@ init(_ configurationClosure: (inout HttpClientConfig) -> Void) {
 }
 {% endhighlight %}
 
-Let's go through this, line by line. Unfortunately, the first line is most complicated, but the others are much simpler, so don't get discouraged!
+Let's go through this, line by line. Unfortunately, the first line is the most complicated, but the others are much simpler, so don't get discouraged!
 
 1. `init(_ configurationClosure: (inout HttpClientConfig) -> Void)`  
     This is the method signature for the initializer. It accepts a single parameter.
       - The `_` as the parameter name indicates that it can be called without a parameter name, like `init(value)`.
       - `configurationClosure` is the parameter name that can be used inside the method.
       - The parameter data type is a closure. The closure accepts a single parameter, of the type `HttpClientConfig`.
-      - Note that the closure's parameter is marked as `inout`. This means that changes to it within the closure will be passed back out to the method. Which is key! We definitely want the person who initializes `HttpClient` to be able to modify `config`.
+      - Note that the closure's parameter is marked as `inout`. This means that changes to it within the closure will be passed back out to the method. Which is key! We definitely want the person who initializes `HttpClient` to be able to modify `config`.  
 
 
 2. `var config = HttpClientConfig()`  
-    Here is where we instantiate `config`. Note that we use `var` here, since we want to allow changes.
+    Here is where we instantiate `config`. Note that we use `var` here, since we want to allow changes.  
 
 3. `configurationClosure(&config)`  
-    This line calls the closure that was passed in to the initializer. Note that we pass the newly instantiated `config` into the closure. Here is where the code that the person who instantiated `HttpClient` will run: Or, in other words, here is where any tweaks to `config` are applied.
+    This line calls the closure that was passed in to the initializer. Note that we pass the newly instantiated `config` into the closure. Here is where the code that the person who instantiated `HttpClient` will run: Or, in other words, here is where any tweaks to `config` are applied.  
 
 4. `self.config = config`  
-    Finally, we stash `config` into our private property, for future reference.
+    Finally, we stash `config` into our private property, for future reference.  
+
+But Does It Work?
+-----------------
+
+Here is some test code, to see if it actually works:
+
+{% highlight swift %}
+let client = HttpClient {
+    config in
+    config.expectSuccess = false
+}
+print(client.config.expectSuccess) // will return `false`
+{% endhighlight %}
+
+Line by line:
+
+1. First, we instantiate `HttpClient` using our fancy new initializer.
+2. Line 2 is where we name the incoming parameter. Remember how we created a `config` object in the `init` for `HttpClient`? Well, here it is.
+3. Let's tweak the config, by setting `expectSuccess` to `false`. Note that its default value is `true`.
+4. Outside the closure, let's examine the value of `expectSuccess` in the client's `config`. (Spoiler alert: It will be `false`).
+
+Since the property, which has a default value of `true`, is now `false`, we know that our initializer worked as expected!
+
+The Solution Code
+-----------------
 
 Here is the complete solution:
 
@@ -131,7 +156,7 @@ let client = HttpClient {
     config in
     config.expectSuccess = false
 }
-print(client.config.expectSuccess)
+print(client.config.expectSuccess) // will return `false`
 {% endhighlight %}
 
 Conclusion
