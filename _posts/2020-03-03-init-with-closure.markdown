@@ -126,7 +126,7 @@ print(client.config.expectSuccess) // will return `false`
 Line by line:
 
 1. First, we instantiate `HttpClient` using our fancy new initializer.
-2. Line 2 is where we name the incoming parameter. Remember how we create a `config` object in the `init` for `HttpClient`? Well, here it is.
+2. Line 2 is where we name the incoming parameter. Remember how we created a `config` object in the `init` for `HttpClient`? Well, here it is.
 3. Let's tweak the config, by setting `expectSuccess` to `false`. Note that its default value is `true`.
 4. Outside the closure, let's examine the value of `expectSuccess` in the client's `config`. (Spoiler alert: It will be `false`).
 
